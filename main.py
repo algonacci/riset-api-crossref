@@ -316,6 +316,9 @@ class CrossrefClient:
 
     def iter_works(self, max_results: int, page_size: int = 100, **kwargs: Any) -> Iterator[dict]:
         """Deep pagination with Crossref cursors (offset is capped at 10k by Crossref)."""
+        if kwargs.get("query") and not kwargs.get("sort"):
+            # cursor paging does not rank by relevance unless asked to
+            kwargs["sort"] = "relevance"
         cursor, yielded = "*", 0
         while yielded < max_results:
             page = self.works(rows=min(page_size, max_results - yielded), cursor=cursor, **kwargs)
